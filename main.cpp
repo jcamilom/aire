@@ -24,11 +24,12 @@ int main() {
     }
 
 
-    // Do a GET request to httpbin.org
+    // Do a GET request to a local Sentilo instance
     {
         // By default the body is automatically parsed and stored in a buffer, this is memory heavy.
         // To receive chunked response, pass in a callback as last parameter to the constructor.
-        HttpRequest* get_req = new HttpRequest(netif, HTTP_GET, "http://httpbin.org/status/418");
+        HttpRequest* get_req = new HttpRequest(netif, HTTP_GET, "http://192.168.0.22:8081/data/udeaProvider/udeaTemp");
+        get_req->set_header("IDENTITY_KEY","29adcdf9b8f0401d99e0637b7eb7281159f2e776352752f0a2358bf325261cd0");
 
         HttpResponse* get_res = get_req->send();
         if (!get_res) {
@@ -42,23 +43,24 @@ int main() {
         delete get_req;
     }
 
-    // POST request to httpbin.org
+    // PUT request to publish an observabtion on local Sentilo
     {
-        HttpRequest* post_req = new HttpRequest(netif, HTTP_POST, "http://httpbin.org/post");
-        post_req->set_header("Content-Type", "application/json");
+        HttpRequest* put_req = new HttpRequest(netif, HTTP_PUT, "http://192.168.0.22:8081/data/udeaProvider/udeaTemp/28.9");
+        //put_req->set_header("Content-Type", "application/json");
+        put_req->set_header("IDENTITY_KEY","29adcdf9b8f0401d99e0637b7eb7281159f2e776352752f0a2358bf325261cd0");
 
-        const char body[] = "{\"hello\":\"world\"}";
+        //const char body[] = "{\"hello\":\"world\"}";
 
-        HttpResponse* post_res = post_req->send(body, strlen(body));
-        if (!post_res) {
-            printf("HttpRequest failed (error code %d)\r\n", post_req->get_error());
+        HttpResponse* put_res = put_req->send();//send(body, strlen(body));
+        if (!put_res) {
+            printf("HttpRequest failed (error code %d)\r\n", put_req->get_error());
             return 1;
         }
 
-        printf("\r\n----- HTTP POST response -----\r\n");
-        dump_response(post_res);
+        printf("\r\n----- HTTP PUT response -----\r\n");
+        dump_response(put_res);
 
-        delete post_req;
+        delete put_req;
     }
 
     wait(osWaitForever);
