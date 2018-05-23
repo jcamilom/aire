@@ -1,25 +1,65 @@
-/* mbed Example Program
- * Copyright (c) 2006-2014 ARM Limited
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 #include "mbed.h"
- 
-Serial pc(USBTX, USBRX); // tx, rx
+#include "http_request.h"
+#include "EthernetInterface.h"
+
+EthernetInterface eth;
+
+void dump_response(HttpResponse* res) {
+    printf("Status: %d - %s\r\n", res->get_status_code(), res->get_status_message().c_str());
+
+    printf("Headers:\r\n");
+    for (size_t ix = 0; ix < res->get_headers_length(); ix++) {
+        printf("\t%s: %s\r\n", res->get_headers_fields()[ix]->c_str(), res->get_headers_values()[ix]->c_str());
+    }
+    printf("\r\nBody (%d bytes):\r\n\r\n%s\r\n", res->get_body_length(), res->get_body_as_string().c_str());
+}
  
 int main() {
-    pc.printf("Hello World!\n\r");
-    while(1) {
-        pc.putc(pc.getc() + 1); // echo input back to terminal
+    NetworkInterface* netif = &eth;
+    int connect_success = eth.connect();
+    if(connect_success == 0) {
+        printf("[EasyConnect] Connected to Network successfully\r\n");
+    } else {
+        printf("[EasyConnect] Connection to Network Failed %d!\r\n", connect_success);
     }
+
+
+    // Do a GET request to httpbin.org
+    {
+        // By default the body is automatically parsed and stored in a buffer, this is memory heavy.
+        // To receive chunked response, pass in a callback as last parameter to the constructor.
+        HttpRequest* get_req = new HttpRequest(netif, HTTP_GET, "http://httpbin.org/status/418");
+
+        HttpResponse* get_res = get_req->send();
+        if (!get_res) {
+            printf("HttpRequest failed (error code %d)\r\n", get_req->get_error());
+            return 1;
+        }
+
+        printf("\r\n----- HTTP GET response -----\r\n");
+        dump_response(get_res);
+
+        delete get_req;
+    }
+
+    // POST request to httpbin.org
+    {
+        HttpRequest* post_req = new HttpRequest(netif, HTTP_POST, "http://httpbin.org/post");
+        post_req->set_header("Content-Type", "application/json");
+
+        const char body[] = "{\"hello\":\"world\"}";
+
+        HttpResponse* post_res = post_req->send(body, strlen(body));
+        if (!post_res) {
+            printf("HttpRequest failed (error code %d)\r\n", post_req->get_error());
+            return 1;
+        }
+
+        printf("\r\n----- HTTP POST response -----\r\n");
+        dump_response(post_res);
+
+        delete post_req;
+    }
+
+    wait(osWaitForever);
 }
