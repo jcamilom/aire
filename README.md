@@ -1,6 +1,8 @@
-# Getting started with Serial on mbed OS and K64F
+# Air quality with mbed OS and K64F
 
-This is a repository for an air queality device using the K64F and mbed OS.
+This is a repository for an air queality device using the K64F and mbed OS 5.
+
+It consists of some demo's, which you can select in ``source/select-demo.h``.
 
 Please install [mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli).
 
@@ -9,8 +11,8 @@ Please install [mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cl
 From the command-line, import the applications:
 
 ```
-mbed import 
-cd 
+mbed import https://github.com/jcamilom/aire
+cd aire
 ```
 
 ### Now compile

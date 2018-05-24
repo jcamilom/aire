@@ -1,3 +1,7 @@
+#include "select-demo.h"
+
+#if DEMO == DEMO_SENTILO
+
 #include "mbed.h"
 #include "http_request.h"
 #include "EthernetInterface.h"
@@ -65,3 +69,5 @@ int main() {
 
     wait(osWaitForever);
 }
+
+#endif
