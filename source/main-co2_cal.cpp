@@ -32,11 +32,11 @@ int main(void) {
     ss << voltage;
     std::string val(ss.str());
 
-    std::string ser ("");
+    std::string ser ("http://theproviderserver:8081");
     string prov ("udeaProvider");
     string sen ("udeaTemp");
     //string val ("15.9");
-    string tok ("");
+    string tok ("29adcdf9b8f0401d99e0637b7eb7281159f2e776352752f0a2358bf325261cd0");
 
     int rt = sendObservation(ser, prov, sen, val, tok);
     if(rt == 1) {
