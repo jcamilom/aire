@@ -36,7 +36,7 @@ int main(void) {
     string prov ("udeaProvider");
     string sen ("udeaTemp");
     //string val ("15.9");
-    string tok ("29adcdf9b8f0401d99e0637b7eb7281159f2e776352752f0a2358bf325261cd0");
+    string tok ("5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf");
 
     int rt = sendObservation(ser, prov, sen, val, tok);
     if(rt == 1) {
