@@ -5,13 +5,13 @@
 #include "mbed.h"
 
 /************************Hardware Related Macros************************************/
-#define         BOARD_VCC                   (5.0)   // The Board's voltage power supply
+#define         BOARD_VCC                   (3.3)   // The Board's voltage power supply
 #define         SEN_PIN                     (A0)    // Define the analog input channel to use
 #define         BOOL_PIN                    (LED1)
 #define         DC_GAIN                     (8.5)   // Define the DC gain of amplifier
 
 /***********************Software Related Macros************************************/
-#define         READ_SAMPLE_INTERVAL        (50)    //define the time interval(in milliseconds) between each samples in normal operation
+#define         READ_SAMPLE_INTERVAL        (50)    // Define the time interval(in milliseconds) between each samples in normal operation
 #define         READ_SAMPLE_TIMES           (5)     //define how many samples you are going to take in normal operation
 
 /**********************Application Related Macros**********************************/
@@ -67,6 +67,7 @@ int main(void) {
         //printf("normalized: 0x%04X \r\n", ain.read_u16());
         wait(2.0f);
     }
+
 }
 
 /*****************************  SENRead *********************************************
