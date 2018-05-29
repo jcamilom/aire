@@ -27,7 +27,7 @@ void handler(int count) {
 	concentration = 1.1*pow(perc,3) + 3.8*pow(perc,2) + 520*perc + 0.62;
 	printf("The low state time was %d ms\r\n",a);
 	printf("The low state percent was %lf \r\n", perc);
-	printf("concentration: %lf \r\n", concentration);
+	printf("concentration: %lf pcs/0.01cf \r\n", concentration);
 	t.reset();
     return;
 }
