@@ -3,6 +3,67 @@
 #include "EthernetInterface.h"
 #include <string>
 
+class SentiloServer {
+        std::string address;         // The Sentilo server address
+    public:
+        SentiloServer(std::string add);
+        std::string getAddress() { return address;}
+};
+
+// Member functions definitions including constructor
+SentiloServer::SentiloServer(std::string add) {
+    address = add;
+}
+
+class Provider {
+        std::string id;             // Provider's id
+        std::string token;          // Authorization token
+        SentiloServer *pServer;     // The Sentilo server
+    public:
+        Provider(std::string idArg, std::string tokenArg, SentiloServer *pServerArg);
+        std::string getServerAddress() { return pServer->getAddress();}
+};
+
+Provider::Provider(std::string idArg, std::string tokenArg, SentiloServer *pServerArg) {
+    id = idArg;
+    token = tokenArg;
+    pServer = pServerArg;
+}
+
+// This class is intended to get actual values from the sensors and return then to the Component class
+class Sensor {
+        std::string id;
+    public:        
+        std::string lastValue;
+        bool lastValueOk;
+
+        std::string getValue() {
+            return "1.0";
+        }
+
+        void setID(std::string idArg) {
+            id = idArg;
+        }
+};  
+
+class Component {
+    public:
+        std::string id;             // Component's id
+        Provider *pProvider;        // Pointer to the related provider
+        Sensor *pSensors;           // Pointer to the first element of the array of sensors
+                                    // for this component.
+
+        Component(std::string idArg, Provider *pProviderArg, Sensor *pSensorsArg) {
+            id = idArg;
+            pProvider = pProviderArg;
+            pSensors = pSensorsArg;
+        }
+
+        int sendSensorObservation(int idx) {
+            return 0;
+        }
+        
+};
 
 void dump_response(HttpResponse* res) {
     printf("Status: %d - %s\r\n", res->get_status_code(), res->get_status_message().c_str());
@@ -23,6 +84,28 @@ void dump_response(HttpResponse* res) {
 * @param[in]
 */
 int sendObservation(string serverAddress, string providerID, string sensorID, string value, string token) {
+
+    // Creates a Sentilo server
+    SentiloServer server("address.com");
+
+    // Creates a provider
+    Provider provider("provname", "token", &server);
+
+    // Create a sensor's array
+    Sensor sensors[2];
+    for(int i = 0; i < 2; i++) {
+		sensors[i].setID("sensor" + std::to_string(i));
+	}
+
+    Sensor *pSensors;
+    pSensors = sensors;
+
+    // Create a component
+    Component component("udeaComponent", &provider, pSensors);
+    
+    // Test the link between the provider created and the server
+    std::cout << "Getting the server address from the provider :" << provider.getServerAddress() << std::endl;
+    // "(*(provider.pServer)).getAddress()"" is the same as "(provider.pServer)->getAddress()"
     
     // Build the URL Request
     string reqURL (serverAddress + "/data/" + providerID + "/" + sensorID + "/" + value);

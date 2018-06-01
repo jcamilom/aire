@@ -1,3 +1,5 @@
 mbed-os
+mbed-http
 BUILD
 .mbed
+__pycache__
