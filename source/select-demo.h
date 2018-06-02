@@ -7,6 +7,6 @@
 #define         DEMO_DUST       4
 #define         DEMO_TEST       5
 
-#define         DEMO            DEMO_DUST
+#define         DEMO            DEMO_CO2_CAL
 
 #endif // _SELECT_DEMO_H_

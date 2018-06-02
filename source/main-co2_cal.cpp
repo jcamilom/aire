@@ -32,16 +32,30 @@ int main(void) {
     ss << voltage;
     std::string val(ss.str());
 
-    std::string ser ("http://theproviderserver:8081");
-    string prov ("udeaProvider");
-    string sen ("udeaTemp");
-    //string val ("15.9");
-    string tok ("5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf");
+    // Creates a Sentilo server
+    SentiloServer server("address");
 
-    int rt = sendObservation(ser, prov, sen, val, tok);
+    // Creates a provider
+    Provider provider("providerName", "theToken", &server);
+
+    // Create a sensor's array
+    Sensor sensors[1];
+    for(int i = 0; i < 1; i++) {
+		//sensors[i].setID("sensor" + std::to_string(i));
+        sensors[i].setID("sensorName");
+        sensors[i].setValue(val);
+	}
+
+    Sensor *pSensors;
+    pSensors = sensors;
+
+    // Create a component
+    Component component("componentName", &provider, pSensors);
+
+    int rt = component.sendSensorObservation(0);
     if(rt == 1) {
         rLED = 0;
-        bLED = 1; 
+        bLED = 1;
     } else {
         grLED = 0;
         bLED = 1;
