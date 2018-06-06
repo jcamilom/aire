@@ -32,12 +32,12 @@ int main(void) {
     ss << voltage;
     std::string val(ss.str());
 
-    // Creates a Sentilo server
-    SentiloServer server("address");
+    // Create a Sentilo server
+    SentiloServer sServer = {"address"};    
 
-    // Creates a provider
-    Provider provider("providerName", "theToken", &server);
-
+    // Create a provider
+    Provider provider = {"providerName", "theToken"};
+    
     // Create a sensor's array
     Sensor sensors[1];
     for(int i = 0; i < 1; i++) {
@@ -49,10 +49,10 @@ int main(void) {
     Sensor *pSensors;
     pSensors = sensors;
 
-    // Create a component
-    Component component("componentName", &provider, pSensors);
+    // Create a component for the air measuring system
+    Component airComponent ("componentName", sServer, provider, pSensors);
 
-    int rt = component.sendSensorObservation(0);
+    int rt = airComponent.sendSensorObservation(0);
     if(rt == 1) {
         rLED = 0;
         bLED = 1;

@@ -13,34 +13,16 @@ void dump_response(HttpResponse* res) {
     printf("\r\nBody (%d bytes):\r\n\r\n%s\r\n", res->get_body_length(), res->get_body_as_string().c_str());
 }
 
-class SentiloServer {
-        std::string address;         // The Sentilo server address
-    public:
-        SentiloServer(std::string add);
-        std::string getAddress() { return address;}
-};
+// A struct for the SenstiloServer object
+typedef struct SentiloServerSt {
+    std::string address;        // The Sentilo server address
+} SentiloServer;
 
-// Member functions definitions including constructor
-SentiloServer::SentiloServer(std::string add) {
-    address = add;
-}
-
-class Provider {
-        std::string id;             // Provider's id
-        std::string token;          // Authorization token
-        SentiloServer *pServer;     // The Sentilo server
-    public:
-        Provider(std::string idArg, std::string tokenArg, SentiloServer *pServerArg);
-        std::string getServerAddress() { return pServer->getAddress();}
-        std::string getID() { return id;}
-        std::string getToken() { return token;}
-};
-
-Provider::Provider(std::string idArg, std::string tokenArg, SentiloServer *pServerArg) {
-    id = idArg;
-    token = tokenArg;
-    pServer = pServerArg;
-}
+// A struct for the Provider object
+typedef struct ProviderSt {
+    std::string id;             // Provider's id
+    std::string token;          // Authorization token
+} Provider;
 
 // This class is intended to get actual values from the sensors and return then to the Component class
 class Sensor {
@@ -69,17 +51,19 @@ class Sensor {
 
 class Component {
     public:
-        std::string id;             // Component's id
-        Provider *pProvider;        // Pointer to the related provider
-        Sensor *pSensors;           // Pointer to the first element of the array of sensors
-                                    // for this component.
+        std::string id;                 // Component's id
+        SentiloServer sentiloServer;    // The sentiloServer member
+        Provider provider;              // The provider member
+        Sensor *pSensors;               // Pointer to the first element of the array of sensors
+                                        // for this component.
 
-        Component(std::string idArg, Provider *pProviderArg, Sensor *pSensorsArg) {
+        Component(std::string idArg, SentiloServer &sentiloServerArg, Provider &providerArg, Sensor *pSensorsArg) {
             id = idArg;
-            pProvider = pProviderArg;
+            sentiloServer = sentiloServerArg;
+            provider = providerArg;
             pSensors = pSensorsArg;
         }
-
+        
         int sendSensorObservation(int idx);
 };
 
@@ -93,7 +77,7 @@ class Component {
 */
 int Component::sendSensorObservation(int idx) {
     // Build the URL Request
-    std::string reqURL (pProvider->getServerAddress() + "/data/" + pProvider->getID() + "/" + (pSensors + idx)->getID() + "/" + (pSensors + idx)->getValue());
+    std::string reqURL (sentiloServer.address + "/data/" + provider.id + "/" + (pSensors + idx)->getID() + "/" + (pSensors + idx)->getValue());
 
     // EthernetInterface object
     EthernetInterface eth;
@@ -111,7 +95,7 @@ int Component::sendSensorObservation(int idx) {
     {
         HttpRequest* put_req = new HttpRequest(netif, HTTP_PUT, reqURL.c_str());
         //put_req->set_header("Content-Type", "application/json");
-        put_req->set_header("IDENTITY_KEY", pProvider->getToken().c_str());
+        put_req->set_header("IDENTITY_KEY", provider.token.c_str());
 
         //const char body[] = "{\"hello\":\"world\"}";
 
@@ -126,5 +110,5 @@ int Component::sendSensorObservation(int idx) {
 
         delete put_req;
     }
-    return 0;    
+    return 0;
 }
