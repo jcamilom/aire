@@ -5,7 +5,8 @@
 #define         DEMO_DFROBOT    2
 #define         DEMO_CO2_CAL    3
 #define         DEMO_DUST       4
-#define         DEMO_TEST       5
+#define         DEMO_SPEC       5
+#define         DEMO_TEST       6
 
 #define         DEMO            DEMO_CO2_CAL
 
