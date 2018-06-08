@@ -7,7 +7,8 @@
 #define         DEMO_DUST       4
 #define         DEMO_SPEC       5
 #define         DEMO_TEST       6
+#define         DEMO_BMP183     7
 
-#define         DEMO            DEMO_CO2_CAL
+#define         DEMO            DEMO_BMP183
 
 #endif // _SELECT_DEMO_H_
