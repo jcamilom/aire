@@ -49,19 +49,17 @@ int main(void) {
     pSensors = sensors;
 
     // Create a component for the air measuring system
-    Component airComponent ("componentName", sServer, provider, pSensors);
+    Component airComponent ("componentName", sServer, provider, pSensors, 1);
 
-    if(sensors[0].lastValueOK()) {
-        int rt = airComponent.sendSensorObservation(0);
-        if(rt == 1) {
-            rLED = 0;
-            bLED = 1;
-        } else {
-            grLED = 0;
-            bLED = 1;
-        }
-        printf("URL: %d\r\n", rt);
+    int rt = airComponent.sendSensorsObservations();    
+    if(rt == 1) {
+        rLED = 0;
+        bLED = 1;
+    } else {
+        grLED = 0;
+        bLED = 1;
     }
+    printf("URL: %d\r\n", rt);    
 
     wait(osWaitForever);
 }

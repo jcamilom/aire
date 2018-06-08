@@ -61,15 +61,19 @@ class Component {
         Provider provider;              // The provider member
         Sensor *pSensors;               // Pointer to the first element of the array of sensors
                                         // for this component.
+        int nSensors;                   // Number of sensors pointed by pSensors
 
-        Component(std::string idArg, SentiloServer &sentiloServerArg, Provider &providerArg, Sensor *pSensorsArg) {
+        Component(std::string idArg, SentiloServer &sentiloServerArg, Provider &providerArg, Sensor *pSensorsArg, int nSensorsArg) {
             id = idArg;
             sentiloServer = sentiloServerArg;
             provider = providerArg;
             pSensors = pSensorsArg;
+            nSensors = nSensorsArg;
         }
         
         int sendSensorObservation(int idx);
+
+        int sendSensorsObservations(void);
 };
 
 /**
@@ -115,5 +119,30 @@ int Component::sendSensorObservation(int idx) {
 
         delete put_req;
     }
+    return 0;
+}
+
+/**
+* Send all sensor's observations to the Sentilo platform.
+*
+*
+*
+* @param[in]
+* @param[in]
+*/
+int Component::sendSensorsObservations(void) {
+    // TODO: check connection and return error values.
+    // If connection ok start sending observations.
+    // Perhaps macros need to be defined.
+    int resp;
+    for(int i = 0; i < nSensors; i++) {
+		if((pSensors + i)->lastValueOK()) {
+            // If status ok, send data
+            resp = sendSensorObservation(i);
+            if(resp == 1) return 1;
+        } else {
+            // TODO: send error value
+        }
+	}
     return 0;
 }
