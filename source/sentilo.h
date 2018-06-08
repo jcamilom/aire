@@ -30,24 +30,29 @@ class Sensor {
         std::string lastValue;
         bool lastValueOk;
     public:
+        Sensor(std::string idArg): id(idArg) {
+            lastValueOk = false; // TODO: inline???
+        }
+
         std::string getValue() {
             return lastValue;
         }
 
         void setValue(std::string lastValueArg) {
             lastValue = lastValueArg;
+            lastValueOk = true;
         }
 
         bool lastValueOK() {
             return lastValueOk;
         }
 
-        void setID(std::string idArg) {
-            id = idArg;
+        void setLastValueErr() {
+            lastValueOk = false;
         }
 
         std::string getID() { return id;}
-};  
+};
 
 class Component {
     public:

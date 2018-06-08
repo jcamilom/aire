@@ -39,10 +39,9 @@ int main(void) {
     Provider provider = {"providerName", "theToken"};
     
     // Create a sensor's array
-    Sensor sensors[1];
+    Sensor sensors[1] = {Sensor("sensorName")};
     for(int i = 0; i < 1; i++) {
 		//sensors[i].setID("sensor" + std::to_string(i));
-        sensors[i].setID("sensorName");
         sensors[i].setValue(val);
 	}
 
@@ -52,15 +51,17 @@ int main(void) {
     // Create a component for the air measuring system
     Component airComponent ("componentName", sServer, provider, pSensors);
 
-    int rt = airComponent.sendSensorObservation(0);
-    if(rt == 1) {
-        rLED = 0;
-        bLED = 1;
-    } else {
-        grLED = 0;
-        bLED = 1;
+    if(sensors[0].lastValueOK()) {
+        int rt = airComponent.sendSensorObservation(0);
+        if(rt == 1) {
+            rLED = 0;
+            bLED = 1;
+        } else {
+            grLED = 0;
+            bLED = 1;
+        }
+        printf("URL: %d\r\n", rt);
     }
-    printf("URL: %d\r\n", rt);
 
     wait(osWaitForever);
 }
