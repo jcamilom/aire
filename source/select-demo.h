@@ -9,6 +9,6 @@
 #define         DEMO_TEST       6
 #define         DEMO_BMP183     7
 
-#define         DEMO            DEMO_BMP183
+#define         DEMO            DEMO_CO2_CAL
 
 #endif // _SELECT_DEMO_H_

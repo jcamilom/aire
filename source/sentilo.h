@@ -72,7 +72,7 @@ class Component {
         }
         
         int sendSensorObservation(int idx);
-
+        int sendSensorObservation(int idx, NetworkInterface* netif);
         int sendSensorsObservations(void);
 };
 
@@ -123,6 +123,40 @@ int Component::sendSensorObservation(int idx) {
 }
 
 /**
+* Send a sensor's observation to the Sentilo platform.
+*
+*
+*
+* @param[in]
+* @param[in]
+*/
+int Component::sendSensorObservation(int idx, NetworkInterface* netif) {
+    // Build the URL Request
+    std::string reqURL (sentiloServer.address + "/data/" + provider.id + "/" + (pSensors + idx)->getID() + "/" + (pSensors + idx)->getValue());
+
+    // PUT request to publish an observabtion on Sentilo
+    {
+        HttpRequest* put_req = new HttpRequest(netif, HTTP_PUT, reqURL.c_str());
+        //put_req->set_header("Content-Type", "application/json");
+        put_req->set_header("IDENTITY_KEY", provider.token.c_str());
+
+        //const char body[] = "{\"hello\":\"world\"}";
+
+        HttpResponse* put_res = put_req->send();//send(body, strlen(body));
+        if (!put_res) {
+            printf("HttpRequest failed (error code %d)\r\n", put_req->get_error());
+            return 1;
+        }
+
+        printf("\r\n----- HTTP PUT response -----\r\n");
+        dump_response(put_res);
+
+        delete put_req;
+    }
+    return 0;
+}
+
+/**
 * Send all sensor's observations to the Sentilo platform.
 *
 *
@@ -134,12 +168,24 @@ int Component::sendSensorsObservations(void) {
     // TODO: check connection and return error values.
     // If connection ok start sending observations.
     // Perhaps macros need to be defined.
-    int resp;
+
+    // EthernetInterface object
+    EthernetInterface eth;
+
+    NetworkInterface* netif = &eth;
+    int resp_success = eth.connect();
+    if(resp_success == 0) {
+        printf("[Network] Connected to Network successfully\r\n");
+    } else {
+        printf("[Network] Connection to Network Failed %d!\r\n", resp_success);
+        return 1;
+    }
+
     for(int i = 0; i < nSensors; i++) {
 		if((pSensors + i)->lastValueOK()) {
             // If status ok, send data
-            resp = sendSensorObservation(i);
-            if(resp == 1) return 1;
+            resp_success = sendSensorObservation(i, netif);
+            if(resp_success == 1) return 1;
         } else {
             // TODO: send error value
         }
