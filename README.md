@@ -6,6 +6,9 @@ It consists of some demo's, which you can select in ``source/select-demo.h``.
 
 Please install [mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli).
 
+Linux installation guide: [mbed linux toolchain](https://forums.mbed.com/t/installed-toolchain-and-mbed-cli-on-linux-tutorial-mbed-compile-failes/2809) 
+Quick start install: [mbed quick start](https://os.mbed.com/docs/v5.8/tutorials/quick-start-offline.html#linux)
+
 ## Import the application
 
 From the command-line, import the applications:
