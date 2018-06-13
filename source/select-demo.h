@@ -8,6 +8,7 @@
 #define         DEMO_SPEC       5
 #define         DEMO_TEST       6
 #define         DEMO_BMP183     7
+#define         DEMO_MAIN       8
 
 #define         DEMO            DEMO_CO2_CAL
 
