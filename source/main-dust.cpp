@@ -1,8 +1,8 @@
 #include "select-demo.h"
+#if DEMO == DEMO_DUST
 #include "mbed.h"
 #include <math.h>
 
-#if DEMO == DEMO_DUST
 
 
 InterruptIn mypin(D3);

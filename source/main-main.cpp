@@ -1,4 +1,5 @@
 #include "select-demo.h"
+#if DEMO == DEMO_MAIN
 #include "sentilo.h"
 #include "mbed.h"
 #include <math.h>
@@ -7,7 +8,6 @@
 #include <iostream>
 #include <string.h>
 
-#if DEMO == DEMO_MAIN
 #define ENTER    13
 
 

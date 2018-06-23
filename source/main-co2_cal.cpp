@@ -33,13 +33,13 @@ int main(void) {
     std::string val(ss.str());
 
     // Create a Sentilo server
-    SentiloServer sServer = {"address"};    
+    SentiloServer sServer = {"sistemic.udea.edu.co:9091"};    
 
     // Create a provider
-    Provider provider = {"providerName", "theToken"};
+    Provider provider = {"udeaProvider", "f4b92b05becd3b0b4d894ed78ffd468126a2622011a5a5aaf3165119c24431b7"};
     
     // Create a sensor's array
-    Sensor sensors[1] = {Sensor("sensorName")};
+    Sensor sensors[1] = {Sensor("udeaTemp")};
     for(int i = 0; i < 1; i++) {
 		//sensors[i].setID("sensor" + std::to_string(i));
         sensors[i].setValue(val);

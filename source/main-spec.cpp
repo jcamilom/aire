@@ -1,8 +1,8 @@
 #include "select-demo.h"
+#if DEMO == DEMO_SPEC
 #include "mbed.h"
 // Creates an event bound to the specified event queue
 
-#if DEMO == DEMO_SPEC
 
 char gas[16];
 char dato[8];
