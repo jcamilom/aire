@@ -11,6 +11,6 @@
 #define         DEMO_MAIN       8
 #define         DEMO_FIWARE     9
 
-#define         DEMO            DEMO_TEST
+#define         DEMO            DEMO_CO2_CAL
 
 #endif // _SELECT_DEMO_H_
