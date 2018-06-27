@@ -32,29 +32,27 @@ int main(void) {
     ss << voltage;
     std::string val(ss.str());
 
-    // Create a Sentilo server
-    SentiloServer sServer = {"sistemic.udea.edu.co:9091"};    
+    // Creates a Sentilo server
+    SentiloServer server("address");
 
-    // Create a provider
-    Provider provider = {"udeaProvider", "f4b92b05becd3b0b4d894ed78ffd468126a2622011a5a5aaf3165119c24431b7"};
-    
+    // Creates a provider
+    Provider provider("providerName", "theToken", &server);
+
     // Create a sensor's array
-    Sensor sensors[3] = {Sensor("spec"),Sensor("temp"),Sensor("hum")};
-    sensors[0].setValue("0.0");
-    sensors[1].setValue("5.0");
-    sensors[2].setValue("10.0");
-    /* for(int i = 0; i < 1; i++) {
-	//	sensors[i].setID("sensor" + std::to_string(i));
-        sensors[i].setValue(std::to_string(i));
-	} */
+    Sensor sensors[1];
+    for(int i = 0; i < 1; i++) {
+		//sensors[i].setID("sensor" + std::to_string(i));
+        sensors[i].setID("sensorName");
+        sensors[i].setValue(val);
+	}
 
     Sensor *pSensors;
     pSensors = sensors;
 
-    // Create a component for the air measuring system
-    Component airComponent ("componentName", sServer, provider, pSensors, 3);
+    // Create a component
+    Component component("componentName", &provider, pSensors);
 
-    int rt = airComponent.sendSensorsObservations();    
+    int rt = component.sendSensorObservation(0);
     if(rt == 1) {
         rLED = 0;
         bLED = 1;
@@ -62,7 +60,7 @@ int main(void) {
         grLED = 0;
         bLED = 1;
     }
-    printf("URL: %d\r\n", rt);    
+    printf("URL: %d\r\n", rt);
 
     wait(osWaitForever);
 }
