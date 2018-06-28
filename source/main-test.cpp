@@ -1,62 +1,69 @@
 #include "select-demo.h"
-#if DEMO == DEMO_TEST
 #include "mbed.h"
-#include "functions.h"
-#include "FATFileSystem.h"
-#include "SDBlockDevice.h"
-#include <stdio.h>
-#include <errno.h>
+// Creates an event bound to the specified event queue
 
-SDBlockDevice bd(PTE3, PTE1, PTE2, PTE4);
-FATFileSystem fs("fs");
+#if DEMO == DEMO_TEST
 
-int main() {
-  int error = 0;
-  printf("Mounting the filesystem on \"/fs\". ");
-  error = fs.mount(&bd);
-  return_error(error);
-  printf("Opening a new file, numbers.txt.\r\n");
-  FILE* fd = fopen("/fs/pairs.txt", "w");
-  errno_error(fd);
-  printf("Writing decimals\r\n");
-  for (int i = 0; i < 20; i++){
-    fprintf(fd, "%d\r\n", i*2);
-  }
+//counter handlers
+class Counter {
+public:
+    Counter(PinName pin) : _interrupt(pin) {        // create the InterruptIn on the pin specified to Counter
+        _interrupt.rise(callback(this, &Counter::increment)); // attach increment function of this counter instance
+    }
 
-  printf("Closing file.\r\n");
-  fclose(fd);
-  printf(" done.\r\n");
+    void increment() {
+        _count++;
+    }
 
-  printf("Re-opening file read-only.\r\n");
-  fd = fopen("/fs/samples.csv", "r");
-  errno_error(fd);
+    int read() {
+        return _count;
+    }
 
-  printf("Dumping file to screen.\r\n");
-  char buff[16] = {0};
-  while (!feof(fd)){
-    int size = fread(&buff[0], 1, 15, fd);
-    fwrite(&buff[0], 1, size, stdout);
-  }
-  printf("EOF.\r\n");
+    void reset_count(){
+        _count = 0;
+    }
 
-  printf("Closing file.\r\n");
-  fclose(fd);
-  printf(" done.\r\n");
+private:
+    InterruptIn _interrupt;
+    volatile int _count;
+};
 
-  printf("Opening root directory.\r\n");
-  DIR* dir = opendir("/fs/");
-  errno_error(fd);
+Counter counter(SW2);
 
-  struct dirent* de;
-  printf("Printing all filenames:\r\n");
-  while((de = readdir(dir)) != NULL){
-    printf("  %s\r\n", &(de->d_name)[0]);
-  }
+//events handlers
+EventQueue queue;
+void handler(int count);
+Event<void(int)> event(&queue, handler);
 
-  printf("Closing root directory. \r\n");
-  error = closedir(dir);
-  return_error(error);
-  printf("Filesystem Demo complete.\r\n");
-  while (true) {}
+void handler(int count) {
+    printf("Count so far: %d\r\n", counter.read_ms());
+    counter.reset_count();
+    return;
 }
+
+void Thread_main(void) {
+    event.post(1);
+}
+
+
+
+// main
+int main() {
+    Thread event_thread;
+    // The event can be manually configured for special timing requirements
+    // specified in milliseconds
+    event.delay(100);       // Starting delay - 100 msec
+    event.period(2000);      // Delay between each evet - 200msec
+    
+    event_thread.start(callback(Thread_main));
+    
+    // Posted events are dispatched in the context of the queue's
+    // dispatch function
+    queue.dispatch(-1);        // Dispatch time - 400msec
+    // 400 msec - Only 2 set of events will be dispatched as period is 200 msec
+    
+    event_thread.join();
+}
+
+
 #endif
