@@ -13,6 +13,20 @@ void dump_response(HttpResponse* res) {
     printf("\r\nBody (%d bytes):\r\n\r\n%s\r\n", res->get_body_length(), res->get_body_as_string().c_str());
 }
 
+void printErrorMessage(int err) {
+    switch(err) {
+        case NSAPI_ERROR_NO_CONNECTION:
+            printf("Error: %d, %s.\r\n", err, "not connected to a network");
+            break;
+        case NSAPI_ERROR_DNS_FAILURE:
+            printf("Error: %d, %s.\r\n\r\n", err, "DNS failed to complete successfully");
+            break;
+        default:
+            printf("Error: %d.\r\n\r\n", err);
+            break;
+    }
+}
+
 // A struct for the SenstiloServer object
 typedef struct SentiloServerSt {
     std::string address;        // The Sentilo server address
@@ -77,19 +91,51 @@ class Component {
             netif = &eth;
         }
         
-        int initConnection(void);
+        nsapi_error_t initConnection(void);
         int sendSensorObservation(int idx);
         int sendSensorsObservations(void);
+
+    private:
+        nsapi_connection_status_t checkConnection(void);
+
 };
 
-int Component::initConnection(void) {
-    int resp_success = netif->connect();
-    if(resp_success == 0) {
+/**
+* Initialize the network connection.
+*
+*
+*
+* @param[in]
+* @param[in]
+*/
+nsapi_error_t Component::initConnection(void) {
+    nsapi_error_t con_st = netif->connect();
+    if(con_st == NSAPI_ERROR_OK) {
         printf("[Network] Connected to Network successfully\r\n");
     } else {
-        printf("[Network] Connection to Network Failed %d!\r\n", resp_success);
+        printf("[Network] Connection to Network Failed!\r\n");
+        printErrorMessage(con_st);
     }
-    return resp_success;
+    return con_st;
+}
+
+/**
+* Check the network connection.
+*
+*
+*
+* @param[in]
+* @param[in]
+*/
+nsapi_connection_status_t Component::checkConnection(void) {
+    nsapi_connection_status_t con_st = netif->get_connection_status();
+    if(con_st == 0) {
+        printf("[Network] Connection status: up\r\n");
+    } else {
+        printf("[Network] Connection status: no connection.\r\n");
+        printErrorMessage(con_st);
+    }
+    return con_st;
 }
 
 /**
@@ -135,7 +181,9 @@ int Component::sendSensorObservation(int idx) {
 * @param[in]
 */
 int Component::sendSensorsObservations(void) {
-    // TODO: check connection and return error values.
+    // TODO: fix behavior of get_connection_status
+    //int con_st = checkConnection();
+
     // If connection ok start sending observations.
     // Perhaps macros need to be defined.
 

@@ -52,33 +52,30 @@ int main(void) {
     Component airComponent ("componentName", sServer, provider, pSensors, 3);
 
     // Initilize network connection
-    int rt = airComponent.initConnection();
+    nsapi_error_t con_st = airComponent.initConnection();
     // Check for connection success
-    if(rt == 0) {
-        rt = airComponent.sendSensorsObservations();    
-        if(rt == 1) {
-            rLED = 0;
-            bLED = 1;
-        } else {
-            grLED = 0;
-            bLED = 1;
-        }
-        printf("URL: %d\r\n", rt);    
+    if(con_st == NSAPI_ERROR_OK) {
+        while(1) {
+            // Reset blue light
+            rLED = 1;
+            grLED = 1;
+            bLED = 0;
 
-        wait(3.0);
-        rLED = 1;
-        grLED = 1;
-        bLED = 0;
+            // Send sensor's observations
+            con_st = airComponent.sendSensorsObservations();    
+            if(con_st == 1) {
+                // Set red light
+                rLED = 0;
+                bLED = 1;
+            } else {
+                // Set green light
+                grLED = 0;
+                bLED = 1;
+            }
+            printf("SendObservations response: %d\r\n", con_st);
 
-        rt = airComponent.sendSensorsObservations();
-        if(rt == 1) {
-            rLED = 0;
-            bLED = 1;
-        } else {
-            grLED = 0;
-            bLED = 1;
+            wait(60.0);
         }
-        printf("URL: %d\r\n", rt);
     }
 
     wait(osWaitForever);
