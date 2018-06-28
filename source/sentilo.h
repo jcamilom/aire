@@ -62,6 +62,7 @@ class Component {
         Sensor *pSensors;               // Pointer to the first element of the array of sensors
                                         // for this component.
         int nSensors;                   // Number of sensors pointed by pSensors
+        NetworkInterface* netif;        // Pointer to the the network interface
 
         Component(std::string idArg, SentiloServer &sentiloServerArg, Provider &providerArg, Sensor *pSensorsArg, int nSensorsArg) {
             id = idArg;
@@ -69,57 +70,26 @@ class Component {
             provider = providerArg;
             pSensors = pSensorsArg;
             nSensors = nSensorsArg;
+
+            // EthernetInterface object
+            EthernetInterface eth;
+
+            netif = &eth;
         }
         
+        int initConnection(void);
         int sendSensorObservation(int idx);
-        int sendSensorObservation(int idx, NetworkInterface* netif);
         int sendSensorsObservations(void);
 };
 
-/**
-* Send a sensor's observation to the Sentilo platform.
-*
-*
-*
-* @param[in]
-* @param[in]
-*/
-int Component::sendSensorObservation(int idx) {
-    // Build the URL Request
-    std::string reqURL (sentiloServer.address + "/data/" + provider.id + "/" + (pSensors + idx)->getID() + "/" + (pSensors + idx)->getValue());
-
-    // EthernetInterface object
-    EthernetInterface eth;
-
-    NetworkInterface* netif = &eth;
-    int connect_success = eth.connect();
-    if(connect_success == 0) {
+int Component::initConnection(void) {
+    int resp_success = netif->connect();
+    if(resp_success == 0) {
         printf("[Network] Connected to Network successfully\r\n");
     } else {
-        printf("[Network] Connection to Network Failed %d!\r\n", connect_success);
+        printf("[Network] Connection to Network Failed %d!\r\n", resp_success);
     }
-
-
-    // PUT request to publish an observabtion on Sentilo
-    {
-        HttpRequest* put_req = new HttpRequest(netif, HTTP_PUT, reqURL.c_str());
-        //put_req->set_header("Content-Type", "application/json");
-        put_req->set_header("IDENTITY_KEY", provider.token.c_str());
-
-        //const char body[] = "{\"hello\":\"world\"}";
-
-        HttpResponse* put_res = put_req->send();//send(body, strlen(body));
-        if (!put_res) {
-            printf("HttpRequest failed (error code %d)\r\n", put_req->get_error());
-            return 1;
-        }
-
-        printf("\r\n----- HTTP PUT response -----\r\n");
-        dump_response(put_res);
-
-        delete put_req;
-    }
-    return 0;
+    return resp_success;
 }
 
 /**
@@ -130,7 +100,7 @@ int Component::sendSensorObservation(int idx) {
 * @param[in]
 * @param[in]
 */
-int Component::sendSensorObservation(int idx, NetworkInterface* netif) {
+int Component::sendSensorObservation(int idx) {
     // Build the URL Request
     std::string reqURL (sentiloServer.address + "/data/" + provider.id + "/" + (pSensors + idx)->getID() + "/" + (pSensors + idx)->getValue());
 
@@ -169,22 +139,12 @@ int Component::sendSensorsObservations(void) {
     // If connection ok start sending observations.
     // Perhaps macros need to be defined.
 
-    // EthernetInterface object
-    EthernetInterface eth;
-
-    NetworkInterface* netif = &eth;
-    int resp_success = eth.connect();
-    if(resp_success == 0) {
-        printf("[Network] Connected to Network successfully\r\n");
-    } else {
-        printf("[Network] Connection to Network Failed %d!\r\n", resp_success);
-        return 1;
-    }
+    int resp_success = 0;
 
     for(int i = 0; i < nSensors; i++) {
 		if((pSensors + i)->lastValueOK()) {
             // If status ok, send data
-            resp_success = sendSensorObservation(i, netif);
+            resp_success = sendSensorObservation(i);
             if(resp_success == 1) return 1;
         } else {
             // TODO: send error value

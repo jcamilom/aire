@@ -33,14 +33,14 @@ int main(void) {
     std::string val(ss.str());
 
     // Create a Sentilo server
-    SentiloServer sServer = {"http://sistemic.udea.edu.co:9091"};
+    SentiloServer sServer = {"address"};
 
     // Create a provider
-    Provider provider = {"udeaProvider", "f4b92b05becd3b0b4d894ed78ffd468126a2622011a5a5aaf3165119c24431b7"};
+    Provider provider = {"providerName", "theToken"};
     
     // Create a sensor's array
-    Sensor sensors[1] = {Sensor("udeaTemp")};
-    for(int i = 0; i < 1; i++) {
+    Sensor sensors[3] = {Sensor("name1"), Sensor("name2"), Sensor("name3")};
+    for(int i = 0; i < 3; i++) {
 		//sensors[i].setID("sensor" + std::to_string(i));
         sensors[i].setValue(val);
 	}
@@ -49,17 +49,37 @@ int main(void) {
     pSensors = sensors;
 
     // Create a component for the air measuring system
-    Component airComponent ("componentName", sServer, provider, pSensors, 1);
+    Component airComponent ("componentName", sServer, provider, pSensors, 3);
 
-    int rt = airComponent.sendSensorsObservations();    
-    if(rt == 1) {
-        rLED = 0;
-        bLED = 1;
-    } else {
-        grLED = 0;
-        bLED = 1;
+    // Initilize network connection
+    int rt = airComponent.initConnection();
+    // Check for connection success
+    if(rt == 0) {
+        rt = airComponent.sendSensorsObservations();    
+        if(rt == 1) {
+            rLED = 0;
+            bLED = 1;
+        } else {
+            grLED = 0;
+            bLED = 1;
+        }
+        printf("URL: %d\r\n", rt);    
+
+        wait(3.0);
+        rLED = 1;
+        grLED = 1;
+        bLED = 0;
+
+        rt = airComponent.sendSensorsObservations();
+        if(rt == 1) {
+            rLED = 0;
+            bLED = 1;
+        } else {
+            grLED = 0;
+            bLED = 1;
+        }
+        printf("URL: %d\r\n", rt);
     }
-    printf("URL: %d\r\n", rt);    
 
     wait(osWaitForever);
 }
