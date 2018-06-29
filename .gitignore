@@ -3,4 +3,5 @@ mbed-http
 BMP183
 BUILD
 .mbed
+.vscode
 __pycache__
