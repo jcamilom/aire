@@ -10,21 +10,44 @@ Linux installation guide: [mbed linux toolchain](https://forums.mbed.com/t/insta
 
 Quick start install: [mbed quick start](https://os.mbed.com/docs/v5.8/tutorials/quick-start-offline.html#linux)
 
+## Installation guide
+```bash
+pip install mbed-cli
+# Additional packages
+pip install msgpack
+pip install mbed-greentea
+pip install mbed-host-tests
+pip install mbed-ls
+pip install mbed-test-wrapper
+# installing i386 architecture packages
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+sudo apt-get update
+sudo apt install gcc-arm-none-eabi -y
+mbed config -G ARM_PATH "/usr/bin/arm-none-eabi-gcc"
+sudo apt install mercurial -y
+sudo apt-get -y install lib32ncurses5
+# and mbed is installed...
+```
 ## Import the application
 
 From the command-line, import the applications:
 
-```
+```bash
 mbed import https://github.com/jcamilom/aire
 cd aire
 ```
 
 ### Now compile
 
-Invoke `mbed compile`, and specify the name of your platform and your favorite toolchain (`GCC_ARM`, `ARM`, `IAR`). For example, for the ARM Compiler 5:
+Invoke `mbed compile`, and specify the name of your platform and your favorite toolchain (`GCC_ARM`, `ARM`, `IAR`). For example, for the GCC_ARM Compiler 5:
 
-```
-mbed compile -m K64F -t ARM
+```bash
+# compile
+mbed compile -m K64F -t GCC_ARM
+# compile & run
+mbed compile -m K64F -t GCC_ARM --flash
 ```
 
 ### Program your board
