@@ -12,13 +12,11 @@ Quick start install: [mbed quick start](https://os.mbed.com/docs/v5.8/tutorials/
 
 ## Installation guide
 ```bash
+# mbed works with python 2.7 and 3.6 only with mbed versions greater than 5.8 
 pip install mbed-cli
 # Additional packages
-pip install msgpack
-pip install mbed-greentea
-pip install mbed-host-tests
-pip install mbed-ls
-pip install mbed-test-wrapper
+pip install msgpack mbed-greentea mbed-host-tests mbed-ls mbed-test-wrapper
+pip install colorama jinja2 intelhex junit_xml pyyaml mbed_host_tests mbed_greentea beautifulsoup4 fuzzywuzzy
 # installing i386 architecture packages
 sudo dpkg --add-architecture i386
 sudo apt-get update
