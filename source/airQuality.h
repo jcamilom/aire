@@ -1,7 +1,6 @@
 #include "select-demo.h"
 
-#if DEMO == FIWARE
-// #if DEMO == AIR_QUALITY
+#if DEMO == AIR_QUALITY2
 
 #include "mbed.h"
 #include "http_request.h"
@@ -43,11 +42,11 @@ typedef struct SentiloServerSt {
 void getGasConcentration(char *, int *measure, long *concentration, long *temperature, long *humidity, int *counter);
 void getDust(double *pm, int *counter);
 void dump_response(HttpResponse *);
-void dump_token(HttpResponse *, std::string);
+void dump_token(HttpResponse *, std::string, int *ack);
 void dump_attrs(HttpResponse *);
 void sendObservation(SentiloServer &, std::string, std::string, int *ack);
-void sendUpdate(std::string, char *);
-void getToken(std::string);
+void sendUpdate(std::string, char *, int *ack);
+void getToken(std::string, int *ack);
 
 // Storage error functions
 
