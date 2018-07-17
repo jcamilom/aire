@@ -38,8 +38,8 @@ int main() {
     myled = 1;    
     //get token 
     while(1) {
-        std::string atributo = "{\"data\":{\"contaminants\":{\"co\": 8,\"no\": 7,\"nox\": 6,\"no2\": 7,\"o3\": 6,\"pm10\": 8,\"pm25\": 8,\"so2\": 6},\"wheater\": {\"wind_dir\": 5,\"wind_hum\": 7,\"wind_spe\": 9,\"wind_tem\": 26,\"pressure\": 6,\"precipitation\": 8}}}";
-        getToken(atributo);
+        std::string atributo = "{\"data\":{\"contaminants\":{\"co\": 8,\"no\": 7,\"nox\": 6,\"no2\": 7,\"o3\": 6,\"pm10\": 8,\"pm25\": 8,\"so2\": 6, \"iaq\": 7},\"wheater\": {\"wind_dir\": 5,\"wind_hum\": 7,\"wind_spe\": 9,\"wind_tem\": 26,\"pressure\": 6,\"precipitation\": 8}}}";
+        getToken(atributo, &ack);
         wait(3600);
         errorled = 1;
         myled = 1;    
@@ -48,20 +48,20 @@ int main() {
 
 
  
-void dump_token(HttpResponse* res, std::string atributos) {
+void dump_token(HttpResponse* res, std::string atributos, int *counter) {
     printf("[Network] token status: %d - %s\r\n", res->get_status_code(), res->get_status_message().c_str());
     char token[42];  // where we will put a copy of the input
     strncpy(token, res->get_body_as_string().c_str() + 17, 40);
     token[40]='\0';
     printf("[Network] the token is: %s \r\n", token);
-    sendUpdate(atributos, token);
+    sendUpdate(atributos, token, counter);
 }
 
 void dump_attrs(HttpResponse* res){
     printf("[Network] update status: %d - %s\r\n", res->get_status_code(), res->get_status_message().c_str());
 }
 
-void getToken(std::string atributos) {
+void getToken(std::string atributos, int *counter) {
     HttpRequest* tok_req = new HttpRequest(netif, HTTP_POST, IDM_ADDR);
     tok_req->set_header("Content-Type", "application/x-www-form-urlencoded");
     tok_req->set_header("Authorization", BASE64);
@@ -73,12 +73,13 @@ void getToken(std::string atributos) {
     }
     else{
         myled = 0;
+        *counter = *counter + 1;
     }
-    dump_token(tok_res, atributos);
+    dump_token(tok_res, atributos,counter);
     delete tok_req;
 }
 
-void sendUpdate(std::string atributos, char* token) {
+void sendUpdate(std::string atributos, char* token, int *counter) {
     HttpRequest* upd_req = new HttpRequest(netif, HTTP_PATCH, PEP_UPDT);
     upd_req->set_header("Content-Type", "application/json");
     upd_req->set_header("Accept", "application/json");
@@ -92,6 +93,7 @@ void sendUpdate(std::string atributos, char* token) {
     }
     else{
         myled = 0;
+        *counter = *counter + 1;
     }
     dump_attrs(upd_res);
     delete upd_req;
