@@ -9,7 +9,8 @@
 #define         DEMO_TEST       6
 #define         DEMO_BMP183     7
 #define         AIR_QUALITY     8
+#define         FIWARE          9
 
-#define         DEMO            AIR_QUALITY
+#define         DEMO     FIWARE
 
 #endif // _SELECT_DEMO_H_
